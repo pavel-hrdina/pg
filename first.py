@@ -1,4 +1,9 @@
-def sude_nebo_liche(cislo: int):
+def sude_nebo_liche(cislo: int) -> None:
+    """
+    Funkce, která zjistí, zda je číslo sudé nebo liché.
+    :param cislo: int
+    :return: none
+    """
     if cislo % 2 == 0:
         print(f"{cislo} je sudé.")
     else:
