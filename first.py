@@ -1,9 +1,9 @@
-def sudy_nebo_lich(cislo: int):
+def sude_nebo_liche(cislo: int):
     if cislo % 2 == 0:
         print(f"{cislo} je sudé.")
     else:
         print(f"{cislo} je liché.")
 
 
-sudy_nebo_lich(1000)
-sudy_nebo_lich(5)
+sude_nebo_liche(1000)
+sude_nebo_liche(5)
