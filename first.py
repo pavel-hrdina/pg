@@ -1,6 +1,7 @@
 def sude_nebo_liche(cislo: int) -> None:
     """
     Funkce, která zjistí, zda je číslo sudé nebo liché.
+
     :param cislo: int
     :return: none
     """
