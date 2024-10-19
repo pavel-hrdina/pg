@@ -11,5 +11,6 @@ def sude_nebo_liche(cislo: int) -> None:
         print(f"{cislo} je liché.")
 
 
-sude_nebo_liche(1000)
-sude_nebo_liche(5)
+if __name__ == "__main__":
+    cislo = int(input("Zadej číslo: "))
+    sude_nebo_liche(cislo)

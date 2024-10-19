@@ -17,11 +17,16 @@ def je_prvocislo(cislo: int) -> bool:
     36 * 1
     Jak vidite v druhe polovine se dvojice opakuji, tzn. v tomto pripade staci overit delitelnost pouze do 6 (vcetne)
     """
-    if cislo > 1 and cislo % 2 != 0:
-        for i in range(3, cislo // 2 + 1, 2):
-            if cislo % i == 0:
-                return False
-        return True
+    if cislo <= 1:
+        return False
+    if cislo == 2:
+        return True  # 2 is prime
+    if cislo % 2 == 0:
+        return False  # Even numbers greater than 2 are not prime
+    for i in range(3, int(cislo ** 0.5) + 1, 2):  # Check only up to the square root
+        if cislo % i == 0:
+            return False
+    return True
 
 
 def vrat_prvocisla(maximum: int) -> list:
