@@ -1,27 +1,33 @@
-def cislo_text(cislo: int) -> str:
+def cislo_text(cislo):
     """
-    # funkce zkonvertuje cislo do jeho textove reprezentace
-    # napr: "25" -> "dvacet pět", omezte se na cisla od 0 do 100
+    Funkce zkonvertuje číslo do jeho textové reprezentace
+    např: "25" -> "dvacet pět", omezte se na čísla od 0 do 100.
+    :param cislo: číslo jako string
+    :return: textová reprezentace čísla
+    """
+    cislo = int(cislo)
 
-    :param cislo: int
-    :return: str
-    """
-    if cislo <= 0 or cislo >= 100:
-        return "Mimo rozsah"
+    if cislo < 0 or cislo > 100:
+        return "Číslo mimo povolený rozsah"
 
     jednotky = ["nula", "jedna", "dva", "tři", "čtyři", "pět", "šest", "sedm", "osm", "devět"]
-    desitky = ["", "deset", "dvacet", "třicet", "čtyřicet", "padesát", "šedesát", "sedmdesát", "osmdesát",
-               "devadesát"]
+    desítky = ["", "", "dvacet", "třicet", "čtyřicet", "padesát", "šedesát", "sedmdesát", "osmdesát", "devadesát"]
+    speciální = ["deset", "jedenáct", "dvanáct", "třináct", "čtrnáct", "patnáct", "šestnáct", "sedmnáct", "osmnáct",
+                 "devatenáct"]
 
-    if cislo % 10 == 0:
-        return desitky[cislo // 10]
-    elif cislo < 10:
+    if cislo < 10:
         return jednotky[cislo]
-    else:
-        return desitky[cislo // 10] + " " + jednotky[cislo % 10]
+    elif cislo < 20:
+        return speciální[cislo - 10]
+    elif cislo < 100:
+        des = desítky[cislo // 10]
+        jed = jednotky[cislo % 10]
+        return des + (f" {jed}" if jed != "nula" else "")
+    else:  # cislo == 100
+        return "sto"
 
 
 if __name__ == "__main__":
-    cislo = int(input("Zadej číslo: "))
+    cislo = input("Zadej číslo: ")
     text = cislo_text(cislo)
     print(text)
