@@ -1,7 +1,6 @@
 import sys
 
-# csob_export_pohyby_20241030_17_58.pdfupravte tělo
-# programu v if __name__ == '__main__' tak, aby z příkazové
+# upravte v těle programu v if __name__ == '__main__' tak, aby z příkazové
 # řádky četl název obrázku, pro který chcete zjistit typ, ošetřete případné vyjímky v bloku try-except
 # upravte funkci read_header(file_name, header_length), aby načítala prvních header_length
 # bytů ze souboru jehož jméno je předáno v parametru file_name upravte funkce is_jpeg, is_gif
@@ -19,7 +18,8 @@ def read_header(file_name, header_length):
     Tato funkce načte binární soubor z cesty file_name,
     z něj přečte prvních header_length bytů a ty vrátí pomocí return
     """
-    return b'xxx'
+    with open(file_name, 'rb') as file:
+        return file.read(header_length)
 
 
 def is_jpeg(file_name):
@@ -31,8 +31,10 @@ def is_jpeg(file_name):
     header = read_header(file_name, len(jpeg_header))
 
     # vyhodnoť zda je soubor jpeg
-
-    return False
+    if header == jpeg_header:
+        return True
+    else:
+        return False
 
 
 def is_gif(file_name):
@@ -41,7 +43,11 @@ def is_gif(file_name):
     tu srovná s definovanými hlavičkami v proměnných gif_header1 a gif_header2
     """
     # vyhodnoť zda je soubor gif
-    return False
+    if read_header(file_name, len(gif_header1)) == gif_header1 or read_header(file_name,
+                                                                              len(gif_header2)) == gif_header2:
+        return True
+    else:
+        return False
 
 
 def is_png(file_name):
@@ -50,7 +56,10 @@ def is_png(file_name):
     tu srovná s definovanou hlavičkou v proměnné png_header
     """
     # vyhodnoť zda je soubor png
-    return False
+    if read_header(file_name, len(png_header)) == png_header:
+        return True
+    else:
+        return False
 
 
 def print_file_type(file_name):
@@ -69,5 +78,8 @@ def print_file_type(file_name):
 
 if __name__ == '__main__':
     # přidej try-catch blok, odchyť obecnou vyjímku Exception a vypiš ji
-    file_name = sys.argv[1]
-    print_file_type(file_name)
+    try:
+        file_name = sys.argv[1]
+        print_file_type(file_name)
+    except Exception as e:
+        print(f'Chyba: {e}')
