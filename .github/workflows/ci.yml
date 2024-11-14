@@ -19,10 +19,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Python dependencies
-        uses: py-actions/py-dependency-install@v4
-        with:
-          path: "requirements.txt"
+          # Step 3: Install dependencies (requirements.txt is in the root directory)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # requirements.txt is in the root directory
+
 
       - name: Run tests
         run: |

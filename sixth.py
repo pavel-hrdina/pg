@@ -19,11 +19,8 @@ def download_url_and_get_all_hrefs(url):
         return []
 
     if response.status_code == 200:
-        # Use BeautifulSoup to parse the HTML content
         soup = BeautifulSoup(response.content, 'html.parser')
-
         hrefs = [a['href'] for a in soup.find_all('a', href=True)]
-
         return hrefs
 
     return []
