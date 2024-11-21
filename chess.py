@@ -2,6 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class Piece(ABC):
+    """
+    Abstraktní třída reprezentující šachovou figurku.
+
+    """
+
     def __init__(self, color, position):
         """
         Inicializuje šachovou figurku.
@@ -22,10 +27,9 @@ class Piece(ABC):
         """
         pass
 
-    @property
-    @abstractmethod
-    def symbol(self):
-        pass
+    @staticmethod
+    def is_position_on_board(position):
+        return 1 <= position[0] <= 8 and 1 <= position[1] <= 8
 
     @property
     def color(self):
@@ -36,40 +40,63 @@ class Piece(ABC):
         return self.__position
 
     @position.setter
-    def position(self, new_position):
-        """
-        Nastaví novou pozici figurky.
-        """
-        self.__position = new_position
+    def position(self, new_postion):
+        self.__position = new_postion
 
     def __str__(self):
-        return f"{self.__class__.__name__}({self.symbol}) at position {self.position}"
+        return f"Piece({self.color}) at position {self.position}"
+
+
+#     Šachovnice odvozená od možných pohybů figurky Knight
+#     Tvoří se z dvojrozměrného pole, kde každá pozice
+#     obsahuje row a col souřadnice, kde se figurka může nacházet.
+#
+#     Figurka se nikdy nemůže pohybovat mimo šachovnici.
+#
+#     Pokud je figurka Knight na pozici (1, 2), může se pohybovat
+#     na pozice (W) (3, 3), (3, 1) a (2, 4). To vyplývá z pravidel šachové hry.
+#
+#     8  .  .  .  .  .  .  .  .
+#     7  .  .  .  .  .  .  .  .
+#     6  .  .  .  .  .  .  .  .
+#     5  .  .  .  .  .  .  .  .
+#     4  .  W  .  .  .  .  .  .
+#     3  .  .  W  .  .  .  .  .
+#     2  K  .  .  .  .  .  .  .
+#     1  .  .  W  .  .  .  .  .
+#         1  2  3  4  5  6  7  8
 
 
 class Pawn(Piece):
     def possible_moves(self):
         """
-        Vrací všechny možné tahy pěšce.
+        Vrací všechny možné tahy pěšce. Pěšec se může pohybovat o jedno nebo
+        dvě pole vpřed, to zde není implementováno, z důvodu jednoduchosti a
+        zbytečnosti pro tento úkol.
 
         :return: Seznam možných pozic [(row, col), ...].
         """
         row, col = self.position
-        moves = []
+        # v závislosti na barvě pěšce se může pohybovat jinak
+        if self.color == "white":
+            moves = [(row + 1, col)]
+            if row == 7:
+                moves.append((row - 2, col))
+        # blok else platí pro černého pěšce, kteý se pohybuje od 8 do 1
+        else:
+            moves = [(row - 1, col)]
+            if row == 2:
+                moves.append((row + 2, col))
 
-        direction = 1 if self.color == "white" else -1
-        moves.append((row + direction, col))
-
-        if (self.color == "white" and row == 2) or (self.color == "black" and row == 7):
-            moves.append((row + 2 * direction, col))
-
-        return [(r, c) for r, c in moves if 0 < r <= 8 and 0 < c <= 8]
-
-    @property
-    def symbol(self):
-        return "♟" if self.color == "black" else "♙"
+        # Filtruje tahy, které jsou mimo šachovnici
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"Pawn({self.symbol}) at position {self.position}"
+        return f"Pawn({self.color}) at position {self.position}"
 
 
 class Knight(Piece):
@@ -91,17 +118,29 @@ class Knight(Piece):
             (row - 1, col - 2),
         ]
         # Filtruje tahy, které jsou mimo šachovnici
-        return [(r, c) for r, c in moves if 0 < r <= 8 and 0 < c <= 8]
-
-    @property
-    def symbol(self):
-        return "♞" if self.color == "black" else "♘"
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"Knight({self.symbol}) at position {self.position}"
+        return f"Knight({self.color}) at position {self.position}"
 
 
 class Bishop(Piece):
+    """
+    Vrací všechny možné tahy střelce. střelec se ze své pozice může pohybovat po
+    diagonálách šachovnice. Pokud se nachází na pozici (4, 4), může se pohybovat
+    na pozice (1, 1), (2, 2), (3, 3), (5, 5), (6, 6), (7, 7), (8, 8), (1, 7),
+    (2,6), (3, 5), (5, 3), (6, 2), (7, 1).
+
+    Pohyby střelce jsou symetrické podle diagonál šachovnice. To znamená, že
+    stačí implementovat pohyby pro jednu diagonálu a ostatní diagonály se
+    získají rotací a zrcadlením. To zde není implementováno, z důvodu
+    jednoduchosti
+    """
+
     def possible_moves(self):
         """
         Vrací všechny možné tahy střelce.
@@ -109,29 +148,32 @@ class Bishop(Piece):
         :return: Seznam možných pozic [(row, col), ...].
         """
         row, col = self.position
+        # střelec se může pohybovat po diagonálách šachovnice
         moves = []
+        for i in range(1, 9):
+            moves.append((row + i, col + i))
+            moves.append((row - i, col - i))
+            moves.append((row + i, col - i))
+            moves.append((row - i, col + i))
 
-        directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-
-        for dr, dc in directions:
-            for i in range(1, 8):
-                new_row, new_col = row + i * dr, col + i * dc
-                if 0 < new_row <= 8 and 0 < new_col <= 8:
-                    moves.append((new_row, new_col))
-                else:
-                    break
-
-        return moves
-
-    @property
-    def symbol(self):
-        return "♝" if self.color == "black" else "♗"
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"Bishop({self.symbol}) at position {self.position}"
+        return f"Bishop({self.color}) at position {self.position}"
 
 
 class Rook(Piece):
+    """
+    Vrací všechny možné tahy věže. Věž se může pohybovat po řádcích a sloupcích
+    šachovnice. Pokud se nachází na pozici (4, 4), může se pohybovat na pozice
+    (1, 4), (2, 4), (3, 4), (5, 4), (6, 4), (7, 4), (8, 4), (4, 1), (4, 2),
+    (4, 3), (4, 5), (4, 6), (4, 7), (4, 8).
+    """
+
     def possible_moves(self):
         """
         Vrací všechny možné tahy věže.
@@ -140,61 +182,63 @@ class Rook(Piece):
         """
         row, col = self.position
         moves = []
+        for i in range(1, 9):
+            moves.append((row, i))
+            moves.append((i, col))
 
-        for i in range(1, 8):
-            # Horizontal moves
-            moves.append((row, col + i))
-            moves.append((row, col - i))
-            # Vertical moves
-            moves.append((row + i, col))
-            moves.append((row - i, col))
-
-        return [(r, c) for r, c in moves if 0 < r <= 8 and 0 < c <= 8]
-
-    @property
-    def symbol(self):
-        return "♜" if self.color == "black" else "♖"
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"Rook({self.symbol}) at position {self.position}"
+        return f"Rook({self.color}) at position {self.position}"
 
 
 class Queen(Piece):
+    """
+    Vrací všechny možné tahy královny. Královna je kombinací střelce a věže.
+    Královna se může pohybovat po diagonálách, řádcích a sloupcích šachovnice.
+    Z pozice (4, 4) se může pohybovat na pozice (1, 1), (2, 2), (3, 3), (5, 5),
+    (6, 6), (7, 7), (8, 8), (1, 7), (2, 6), (3, 5), (5, 3), (6, 2), (7, 1),
+    (1, 4), (2, 4), (3, 4), (5, 4), (6, 4), (7, 4), (8, 4), (4, 1), (4, 2),
+    (4, 3), (4, 5), (4, 6), (4, 7), (4, 8).
+    """
+
     def possible_moves(self):
         """
-        Vrací všechny možné tahy dámy.
+        Vrací všechny možné tahy královny.
 
         :return: Seznam možných pozic [(row, col), ...].
         """
         row, col = self.position
         moves = []
-
-        # Diagonal, horizontal, and vertical moves
-        for i in range(1, 8):
-            # Horizontal moves
-            moves.append((row, col + i))
-            moves.append((row, col - i))
-            # Vertical moves
-            moves.append((row + i, col))
-            moves.append((row - i, col))
-            # Diagonal moves
+        for i in range(1, 9):
             moves.append((row + i, col + i))
+            moves.append((row - i, col - i))
             moves.append((row + i, col - i))
             moves.append((row - i, col + i))
-            moves.append((row - i, col - i))
+            moves.append((row, i))
+            moves.append((i, col))
 
-        # Filter out moves that go outside the board
-        return [(r, c) for r, c in moves if 0 < r <= 8 and 0 < c <= 8]
-
-    @property
-    def symbol(self):
-        return "♛" if self.color == "black" else "♕"
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"Queen({self.symbol}) at position {self.position}"
+        return f"Queen({self.color}) at position {self.position}"
 
 
 class King(Piece):
+    """
+    Vrací všechny možné tahy krále. Král se může pohybovat o jedno pole
+    ve všech směrech. Z pozice (4, 4) se může pohybovat na pozice (3, 3),
+    (3, 4), (3, 5), (4, 3), (4, 5), (5, 3), (5, 4), (5, 5).
+    """
+
     def possible_moves(self):
         """
         Vrací všechny možné tahy krále.
@@ -204,48 +248,25 @@ class King(Piece):
         row, col = self.position
         moves = [
             (row + 1, col),
-            (row - 1, col),
-            (row, col + 1),
-            (row, col - 1),
             (row + 1, col + 1),
             (row + 1, col - 1),
+            (row - 1, col),
             (row - 1, col + 1),
             (row - 1, col - 1),
+            (row, col + 1),
+            (row, col - 1),
         ]
-
-        # Filter out moves that go outside the board
-        return [(r, c) for r, c in moves if 0 < r <= 8 and 0 < c <= 8]
-
-    @property
-    def symbol(self):
-        return "♚" if self.color == "black" else "♔"
+        final_moves = []
+        for move in moves:
+            if self.is_position_on_board(move):
+                final_moves.append(move)
+        return final_moves
 
     def __str__(self):
-        return f"King({self.symbol}) at position {self.position}"
+        return f"King({self.color}) at position {self.position}"
 
 
 if __name__ == "__main__":
-    piece = Knight("white", (1, 2))
-    print(piece)
-    print(piece.possible_moves())
-
-    pawn = Pawn("black", (7, 2))
-    print(pawn)
-    print(pawn.possible_moves())
-
-    # Test other pieces
-    bishop = Bishop("white", (4, 4))
-    print(bishop)
-    print(bishop.possible_moves())
-
-    rook = Rook("black", (5, 5))
-    print(rook)
-    print(rook.possible_moves())
-
-    queen = Queen("white", (3, 3))
-    print(queen)
-    print(queen.possible_moves())
-
-    king = King("black", (8, 8))
-    print(king)
-    print(king.possible_moves())
+    knight = Knight("black", (1, 2))
+    print(knight)
+    print(knight.possible_moves())
