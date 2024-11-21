@@ -182,9 +182,11 @@ class Rook(Piece):
         """
         row, col = self.position
         moves = []
+        # nemůže se pohnout na pozici, na které se nachází
         for i in range(1, 9):
-            moves.append((row, i))
-            moves.append((i, col))
+            if i != row:
+                moves.append((row, i))
+                moves.append((i, col))
 
         final_moves = []
         for move in moves:
@@ -268,5 +270,7 @@ class King(Piece):
 
 if __name__ == "__main__":
     knight = Knight("black", (1, 2))
+    rock = Rook("white", (4, 4))
+    print(rock.possible_moves())
     print(knight)
     print(knight.possible_moves())
