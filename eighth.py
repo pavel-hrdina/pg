@@ -7,7 +7,8 @@ def bin_to_dec(binarni_cislo):
     # funkce spocita hodnotu predavaneho binarniho cisla (binarni_cislo muze byt str i int!!!)
     # 111 -> 7
     # "101" -> 5
-    # 2 znamena, ze cislo je v binarni soustave
+    # funkce int převede ze stringu na int, druhý argument funkce int() je základ soustavy
+    # v tomto případě je základ soustavy 2 (binární soustava)
     return int(str(binarni_cislo), 2)
 
 
