@@ -1,16 +1,14 @@
-def dec_to_bin(cislo):
+def dec_to_bin(cislo) -> str:
     # funkce prevede cislo na binarni reprezentaci (cislo muze byt str i int!!!)
     # 7 -> "111"
     # 5 -> "101"
-    if type(cislo) == str:
-        cislo = int(cislo)
-    binary = ""
+    cislo = int(cislo)
     if cislo == 0:
         return "0"
-    while cislo > 0:
-        binary = str(cislo % 2) + binary
-        cislo = cislo // 2
-    return binary
+    if cislo == 1:
+        return "1"
+    else:
+        return dec_to_bin(cislo // 2) + str(cislo % 2)
 
 
 def test_bin_to_dec():
